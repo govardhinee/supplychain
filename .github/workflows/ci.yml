@@ -1,0 +1,27 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    services:
+      mongo:
+        image: mongo:6.0
+        ports: ['27017:27017']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install roots
+        run: npm install
+      - name: Install contracts deps
+        run: cd contracts && npm install
+      - name: Test contracts
+        run: cd contracts && npm test
+      - name: Install backend deps
+        run: cd backend && npm install
+      - name: Run backend tests
+        run: cd backend && npm test
