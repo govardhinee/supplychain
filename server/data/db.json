@@ -34,6 +34,13 @@
       "password": "pass",
       "role": "End User",
       "walletAddress": "0x8626f6940e2eb28930efb4cef49b2d1f2c9c1199"
+    },
+    {
+      "id": 6,
+      "username": "provider",
+      "password": "pass",
+      "role": "Raw Material Supplier",
+      "walletAddress": "0xcd3b766cCdD6Ae721141F452C550Ca635964ce71"
     }
   ],
   "products": []

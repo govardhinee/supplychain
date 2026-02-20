@@ -33,9 +33,8 @@ const Login = () => {
         }
     };
 
-    const copyCredential = (text) => {
-        navigator.clipboard.writeText(text);
-        alert("Copied: " + text);
+    const fillCredentials = (user, pass) => {
+        setFormData({ username: user, password: pass });
     };
 
     return (
@@ -54,17 +53,17 @@ const Login = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4 }}
                 className="modern-card"
-                style={{ 
-                    width: '100%', 
-                    maxWidth: '420px', 
+                style={{
+                    width: '100%',
+                    maxWidth: '420px',
                     marginBottom: '3rem'
                 }}
             >
                 <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
                     <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🔐</div>
-                    <h2 style={{ 
-                        fontSize: '2rem', 
-                        fontWeight: 700, 
+                    <h2 style={{
+                        fontSize: '2rem',
+                        fontWeight: 700,
                         marginBottom: '0.5rem',
                         color: 'var(--color-text)'
                     }}>
@@ -106,63 +105,66 @@ const Login = () => {
             </motion.div>
 
             {/* Demo Credentials */}
-            <div style={{ width: '100%', maxWidth: '900px' }}>
-                <p style={{ 
-                    textAlign: 'center', 
-                    color: 'var(--color-text-muted)', 
-                    marginBottom: '1.5rem', 
-                    fontSize: '0.875rem', 
-                    textTransform: 'uppercase', 
+            <div style={{ width: '100%', maxWidth: '1000px' }}>
+                <p style={{
+                    textAlign: 'center',
+                    color: 'var(--color-text-muted)',
+                    marginBottom: '1.5rem',
+                    fontSize: '0.875rem',
+                    textTransform: 'uppercase',
                     letterSpacing: '1px',
                     fontWeight: 600
                 }}>
-                    Demo Accounts
+                    Click to Auto-Fill Demo Accounts
                 </p>
-                <div style={{ 
-                    display: 'grid', 
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
-                    gap: '1rem' 
+                <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+                    gap: '1rem'
                 }}>
                     {[
-                        { role: 'Manufacturer', user: 'manufacturer', pass: 'pass', icon: '🏭', hint: 'Creates products & starts the journey' },
-                        { role: 'Warehouse', user: 'warehouse', pass: 'pass', icon: '🏢', hint: 'Receives from Manufacturer' },
-                        { role: 'Supplier', user: 'supplier', pass: 'pass', icon: '🚚', hint: 'Moves goods to Retailer' },
+                        { role: 'Provider', user: 'provider', pass: 'pass', icon: '🌾', hint: 'Supplies Raw Materials' },
+                        { role: 'Manufacturer', user: 'manufacturer', pass: 'pass', icon: '🏭', hint: 'Creates products' },
+                        { role: 'Warehouse', user: 'warehouse', pass: 'pass', icon: '🏢', hint: 'Stores products' },
+                        { role: 'Supplier', user: 'supplier', pass: 'pass', icon: '🚚', hint: 'Distributes goods' },
                         { role: 'Retailer', user: 'retailer', pass: 'pass', icon: '🏪', hint: 'Sells to End User' },
-                        { role: 'End User', user: 'enduser', pass: 'pass', icon: '🧑‍🍳', hint: 'Checks if product is delivered or not' }
+                        { role: 'End User', user: 'enduser', pass: 'pass', icon: '🧑‍🍳', hint: 'Consumer' }
                     ].map(cred => (
                         <motion.div
                             key={cred.role}
-                            whileHover={{ y: -4 }}
+                            whileHover={{ y: -4, backgroundColor: 'rgba(255, 255, 255, 0.05)' }}
+                            whileTap={{ scale: 0.95 }}
                             className="glass-card"
                             style={{
                                 padding: '1.25rem',
                                 cursor: 'pointer',
-                                textAlign: 'center'
+                                textAlign: 'center',
+                                transition: 'background-color 0.2s'
                             }}
-                            onClick={() => copyCredential(cred.user)}
+                            onClick={() => fillCredentials(cred.user, cred.pass)}
                         >
                             <div style={{ fontSize: '2rem', marginBottom: '0.75rem' }}>{cred.icon}</div>
-                            <h4 style={{ 
-                                color: 'var(--color-text)', 
-                                fontWeight: 600, 
+                            <h4 style={{
+                                color: 'var(--color-text)',
+                                fontWeight: 600,
                                 marginBottom: '0.5rem',
                                 fontSize: '1rem'
                             }}>
                                 {cred.role}
                             </h4>
                             <div>
-                                <div style={{ 
-                                    fontSize: '0.8125rem', 
+                                <div style={{
+                                    fontSize: '0.8125rem',
                                     color: 'var(--color-text-muted)',
                                     fontFamily: 'monospace'
                                 }}>
                                     <div>{cred.user}</div>
                                     <div style={{ marginTop: '0.25rem' }}>••••</div>
                                 </div>
-                                <p style={{ 
-                                    marginTop: '0.4rem', 
-                                    fontSize: '0.75rem', 
-                                    color: 'var(--color-text-muted)' 
+                                <p style={{
+                                    marginTop: '0.4rem',
+                                    fontSize: '0.75rem',
+                                    color: 'var(--color-text-muted)'
                                 }}>
                                     {cred.hint}
                                 </p>
