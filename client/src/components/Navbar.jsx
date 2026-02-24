@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import React, { useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { BlockchainContext } from '../context/BlockchainContext';
 
@@ -8,7 +8,7 @@ const Navbar = () => {
 
     return (
         <nav style={{
-            background: 'rgba(11, 14, 20, 0.85)',
+            background: 'rgba(15, 23, 42, 0.9)',
             backdropFilter: 'blur(10px)',
             borderBottom: '1px solid var(--color-border)',
             padding: '1rem 2rem',
@@ -23,11 +23,11 @@ const Navbar = () => {
             minHeight: '70px',
             boxSizing: 'border-box'
         }}>
-            <div
+            <div 
                 onClick={() => navigate('/')}
-                style={{
-                    display: 'flex',
-                    alignItems: 'center',
+                style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
                     gap: '0.75rem',
                     cursor: 'pointer'
                 }}
@@ -42,18 +42,22 @@ const Navbar = () => {
                     justifyContent: 'center',
                     fontSize: '1.25rem'
                 }}>🔗</div>
-                <h1 className="text-gradient" style={{
-                    fontSize: '1.5rem',
-                    margin: 0
+                <h1 style={{ 
+                    fontSize: '1.5rem', 
+                    fontWeight: 700,
+                    background: 'linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    backgroundClip: 'text'
                 }}>
                     SupplyChain.io
                 </h1>
             </div>
 
             <div style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
-                <Link
-                    to="/"
-                    style={{
+                <Link 
+                    to="/" 
+                    style={{ 
                         color: 'var(--color-text)',
                         fontWeight: 500,
                         fontSize: '0.9375rem',
@@ -64,9 +68,9 @@ const Navbar = () => {
                 >
                     Dashboard
                 </Link>
-                <Link
-                    to="/track"
-                    style={{
+                <Link 
+                    to="/track" 
+                    style={{ 
                         color: 'var(--color-text-muted)',
                         fontWeight: 500,
                         fontSize: '0.9375rem',
@@ -77,9 +81,9 @@ const Navbar = () => {
                 >
                     Track Product
                 </Link>
-                <Link
-                    to="/admin"
-                    style={{
+                <Link 
+                    to="/admin" 
+                    style={{ 
                         color: 'var(--color-text-muted)',
                         fontWeight: 500,
                         fontSize: '0.9375rem',
@@ -94,30 +98,18 @@ const Navbar = () => {
 
             <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
                 {currentUser && (
-                    <Link to="/dashboard" style={{ textDecoration: 'none' }}>
-                        <div style={{
-                            padding: '0.5rem 1rem',
-                            background: 'rgba(139, 92, 246, 0.15)',
-                            borderRadius: '8px',
-                            border: '1px solid rgba(139, 92, 246, 0.3)',
-                            fontSize: '0.875rem',
-                            fontWeight: 600,
-                            color: 'var(--color-accent)',
-                            marginRight: '0.5rem',
-                            cursor: 'pointer',
-                            transition: 'all 0.2s ease-in-out'
-                        }}
-                            onMouseEnter={(e) => {
-                                e.currentTarget.style.background = 'rgba(139, 92, 246, 0.3)';
-                                e.currentTarget.style.transform = 'translateY(-1px)';
-                            }}
-                            onMouseLeave={(e) => {
-                                e.currentTarget.style.background = 'rgba(139, 92, 246, 0.15)';
-                                e.currentTarget.style.transform = 'translateY(0)';
-                            }}>
-                            {currentUser.role}
-                        </div>
-                    </Link>
+                    <div style={{
+                        padding: '0.5rem 1rem',
+                        background: 'rgba(139, 92, 246, 0.15)',
+                        borderRadius: '8px',
+                        border: '1px solid rgba(139, 92, 246, 0.3)',
+                        fontSize: '0.875rem',
+                        fontWeight: 600,
+                        color: 'var(--color-accent)',
+                        marginRight: '0.5rem'
+                    }}>
+                        {currentUser.role}
+                    </div>
                 )}
 
                 {currentUser ? (

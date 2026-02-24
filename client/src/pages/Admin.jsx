@@ -1,26 +1,23 @@
-import { motion } from 'framer-motion';
-import { useContext, useEffect, useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { BlockchainContext } from '../context/BlockchainContext';
+import { motion } from 'framer-motion';
 
 const Admin = () => {
     const { contract } = useContext(BlockchainContext);
     const [allProducts, setAllProducts] = useState([]);
-    const [allRawMaterials, setAllRawMaterials] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [rmLoading, setRmLoading] = useState(false);
     const [stats, setStats] = useState({
         total: 0,
         created: 0,
         inTransit: 0,
         inWarehouse: 0,
-        delivered: 0,
-        totalRM: 0
+        delivered: 0
     });
     const [contractError, setContractError] = useState('');
     const formatId = (id) => String(id).padStart(4, '0');
 
     const statusMap = ["Created", "In Transit", "In Warehouse", "Delivered"];
-
+    
     const getRoleFromAddress = (addr) => {
         const lowerAddr = addr.toLowerCase();
         if (lowerAddr === '0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266') return 'Manufacturer';
@@ -46,8 +43,7 @@ const Admin = () => {
                 created: 0,
                 inTransit: 0,
                 inWarehouse: 0,
-                delivered: 0,
-                totalRM: stats.totalRM
+                delivered: 0
             };
 
             // Fetch all products
@@ -56,7 +52,7 @@ const Admin = () => {
                     const p = await contract.getProduct(i);
                     const statusIndex = Number(p.status);
                     const statusName = statusMap[statusIndex];
-
+                    
                     // Count by status
                     if (statusIndex === 0) statusCounts.created++;
                     else if (statusIndex === 1) statusCounts.inTransit++;
@@ -98,51 +94,14 @@ const Admin = () => {
         }
     };
 
-    const fetchAllRawMaterials = async () => {
-        if (!contract) return;
-        setRmLoading(true);
-        try {
-            const count = await contract.rawMaterialCount();
-            const materials = [];
-            for (let i = 1; i <= Number(count); i++) {
-                try {
-                    const rm = await contract.getRawMaterial(i);
-                    materials.push({
-                        id: rm.id.toString(),
-                        name: rm.name,
-                        supplier: rm.supplier,
-                        certificate: rm.certificateHash,
-                        lat: rm.lat,
-                        long: rm.long
-                    });
-                } catch (err) {
-                    console.error(`Error fetching RM ${i}:`, err);
-                }
-            }
-            materials.sort((a, b) => Number(b.id) - Number(a.id));
-            setAllRawMaterials(materials);
-            setStats(prev => ({ ...prev, totalRM: Number(count) }));
-        } catch (error) {
-            console.error("Error fetching raw materials:", error);
-        } finally {
-            setRmLoading(false);
-        }
-    };
-
     useEffect(() => {
         if (contract) {
             fetchAllProducts();
-            fetchAllRawMaterials();
         }
     }, [contract]);
 
-    const refreshAll = () => {
-        fetchAllProducts();
-        fetchAllRawMaterials();
-    };
-
     const getStatusBadgeClass = (status) => {
-        switch (status) {
+        switch(status) {
             case 0: return 'badge-info';
             case 1: return 'badge-warning';
             case 2: return 'badge-info';
@@ -154,8 +113,8 @@ const Admin = () => {
     return (
         <div style={{ paddingTop: '120px', paddingBottom: '50px', maxWidth: '1400px', margin: '0 auto', padding: '2rem' }}>
             <header style={{ marginBottom: '3rem' }}>
-                <h1 style={{
-                    fontSize: '2.5rem',
+                <h1 style={{ 
+                    fontSize: '2.5rem', 
                     fontWeight: 700,
                     marginBottom: '0.5rem',
                     color: 'var(--color-text)'
@@ -168,9 +127,9 @@ const Admin = () => {
             </header>
 
             {/* Statistics Cards */}
-            <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+            <div style={{ 
+                display: 'grid', 
+                gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
                 gap: '1.5rem',
                 marginBottom: '3rem'
             }}>
@@ -242,34 +201,20 @@ const Admin = () => {
                     </div>
                     <div style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>Delivered</div>
                 </motion.div>
-
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.5 }}
-                    className="modern-card"
-                    style={{ padding: '1.5rem', textAlign: 'center' }}
-                >
-                    <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>🧵</div>
-                    <div style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--color-primary)', marginBottom: '0.25rem' }}>
-                        {stats.totalRM}
-                    </div>
-                    <div style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>Raw Materials</div>
-                </motion.div>
             </div>
 
             {/* Actions */}
             <div style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <h2 style={{ fontSize: '1.75rem', fontWeight: 700, color: 'var(--color-text)' }}>
-                    System Status
+                    All Products ({allProducts.length})
                 </h2>
-                <button
-                    onClick={refreshAll}
+                <button 
+                    onClick={fetchAllProducts}
                     className="btn-modern"
-                    disabled={loading || rmLoading}
+                    disabled={loading}
                     style={{ padding: '0.75rem 1.5rem' }}
                 >
-                    {loading || rmLoading ? 'Loading...' : '🔄 Refresh All Data'}
+                    {loading ? 'Loading...' : '🔄 Refresh'}
                 </button>
             </div>
 
@@ -307,48 +252,48 @@ const Admin = () => {
                     <div style={{ overflowX: 'auto' }}>
                         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                             <thead>
-                                <tr style={{
+                                <tr style={{ 
                                     background: 'rgba(59, 130, 246, 0.1)',
                                     borderBottom: '2px solid var(--color-border)'
                                 }}>
-                                    <th style={{
-                                        padding: '1rem',
-                                        textAlign: 'left',
+                                    <th style={{ 
+                                        padding: '1rem', 
+                                        textAlign: 'left', 
                                         fontWeight: 600,
                                         color: 'var(--color-text)',
                                         fontSize: '0.875rem'
                                     }}>ID</th>
-                                    <th style={{
-                                        padding: '1rem',
-                                        textAlign: 'left',
+                                    <th style={{ 
+                                        padding: '1rem', 
+                                        textAlign: 'left', 
                                         fontWeight: 600,
                                         color: 'var(--color-text)',
                                         fontSize: '0.875rem'
                                     }}>Product Name</th>
-                                    <th style={{
-                                        padding: '1rem',
-                                        textAlign: 'left',
+                                    <th style={{ 
+                                        padding: '1rem', 
+                                        textAlign: 'left', 
                                         fontWeight: 600,
                                         color: 'var(--color-text)',
                                         fontSize: '0.875rem'
                                     }}>Batch ID</th>
-                                    <th style={{
-                                        padding: '1rem',
-                                        textAlign: 'left',
+                                    <th style={{ 
+                                        padding: '1rem', 
+                                        textAlign: 'left', 
                                         fontWeight: 600,
                                         color: 'var(--color-text)',
                                         fontSize: '0.875rem'
                                     }}>Current Owner</th>
-                                    <th style={{
-                                        padding: '1rem',
-                                        textAlign: 'left',
+                                    <th style={{ 
+                                        padding: '1rem', 
+                                        textAlign: 'left', 
                                         fontWeight: 600,
                                         color: 'var(--color-text)',
                                         fontSize: '0.875rem'
                                     }}>Status</th>
-                                    <th style={{
-                                        padding: '1rem',
-                                        textAlign: 'left',
+                                    <th style={{ 
+                                        padding: '1rem', 
+                                        textAlign: 'left', 
                                         fontWeight: 600,
                                         color: 'var(--color-text)',
                                         fontSize: '0.875rem'
@@ -405,50 +350,6 @@ const Admin = () => {
                             </tbody>
                         </table>
                     </div>
-                </div>
-            )}
-
-            {/* Raw Materials Section */}
-            <h2 style={{ fontSize: '1.75rem', fontWeight: 700, color: 'var(--color-text)', marginTop: '4rem', marginBottom: '2rem' }}>
-                Supplied Raw Materials ({allRawMaterials.length})
-            </h2>
-
-            {rmLoading ? (
-                <div className="modern-card" style={{ padding: '2rem', textAlign: 'center' }}>
-                    <p>Loading Raw Materials...</p>
-                </div>
-            ) : allRawMaterials.length === 0 ? (
-                <div className="modern-card" style={{ padding: '3rem', textAlign: 'center' }}>
-                    <p style={{ color: 'var(--color-text-muted)' }}>No raw materials found in the system</p>
-                </div>
-            ) : (
-                <div className="modern-card" style={{ padding: '0', overflowX: 'auto' }}>
-                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                        <thead>
-                            <tr style={{ background: 'rgba(59, 130, 246, 0.1)', borderBottom: '2px solid var(--color-border)' }}>
-                                <th style={{ padding: '1rem', textAlign: 'left' }}>ID</th>
-                                <th style={{ padding: '1rem', textAlign: 'left' }}>Material Name</th>
-                                <th style={{ padding: '1rem', textAlign: 'left' }}>Supplier</th>
-                                <th style={{ padding: '1rem', textAlign: 'left' }}>Certificate</th>
-                                <th style={{ padding: '1rem', textAlign: 'left' }}>Location</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {allRawMaterials.map(rm => (
-                                <tr key={rm.id} style={{ borderBottom: '1px solid var(--color-border)' }}>
-                                    <td style={{ padding: '1rem', color: 'var(--color-primary)' }}>#{formatId(rm.id)}</td>
-                                    <td style={{ padding: '1rem', fontWeight: 500 }}>{rm.name}</td>
-                                    <td style={{ padding: '1rem', fontSize: '0.8rem', fontFamily: 'monospace' }}>{rm.supplier}</td>
-                                    <td style={{ padding: '1rem', fontSize: '0.8rem' }}>
-                                        {rm.certificate.startsWith('http') ? (
-                                            <a href={rm.certificate} target="_blank" rel="noreferrer" style={{ color: 'var(--color-primary)' }}>View</a>
-                                        ) : rm.certificate}
-                                    </td>
-                                    <td style={{ padding: '1rem', fontSize: '0.8rem' }}>{rm.lat}, {rm.long}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
                 </div>
             )}
         </div>

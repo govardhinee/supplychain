@@ -1,11 +1,9 @@
+import React from 'react';
 import { motion } from 'framer-motion';
-import { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BlockchainContext } from '../context/BlockchainContext';
 
 const Landing = () => {
     const navigate = useNavigate();
-    const { currentUser } = useContext(BlockchainContext);
 
     return (
         <div style={{
@@ -19,13 +17,14 @@ const Landing = () => {
             position: 'relative',
             overflow: 'hidden'
         }}>
-            {/* Inheriting global theme background */}
+            {/* Subtle Background Pattern */}
             <div style={{
                 position: 'absolute',
                 top: 0,
                 left: 0,
                 right: 0,
                 bottom: 0,
+                backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%)',
                 zIndex: 0
             }} />
 
@@ -73,11 +72,11 @@ const Landing = () => {
                         style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}
                     >
                         <button
-                            onClick={() => currentUser ? navigate('/dashboard') : navigate('/login')}
+                            onClick={() => navigate('/login')}
                             className="btn-modern"
                             style={{ minWidth: '200px' }}
                         >
-                            {currentUser ? 'Go to Dashboard' : 'Get Started'}
+                            Get Started
                         </button>
                         <button
                             onClick={() => navigate('/track')}

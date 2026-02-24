@@ -1,11 +1,11 @@
-import { AnimatePresence, motion } from 'framer-motion';
-import { Html5QrcodeScanner } from 'html5-qrcode';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
+import React, { useState, useContext, useEffect } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
-import { useContext, useEffect, useState } from 'react';
-import { MapContainer, Marker, Polyline, Popup, TileLayer, useMap } from 'react-leaflet';
 import { BlockchainContext } from '../context/BlockchainContext';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Html5QrcodeScanner } from 'html5-qrcode';
+import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
 
 // Fix Leaflet Default Icon
 import icon from 'leaflet/dist/images/marker-icon.png';
@@ -42,20 +42,19 @@ const LocationName = ({ lat, long }) => {
 
         const fetchName = async () => {
             try {
-                // Using BigDataCloud's free client-side reverse geocoding API to prevent CORS/User-Agent blocking
-                const response = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${long}&localityLanguage=en`);
+                const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${long}`);
                 if (!response.ok) throw new Error("Failed to fetch");
                 const data = await response.json();
 
-                if (data.city || data.locality || data.principalSubdivision) {
-                    const place = data.city || data.locality || data.principalSubdivision;
-                    const country = data.countryName || '';
-                    setName(place ? `${place}${country ? `, ${country}` : ''}` : country);
+                if (data.address) {
+                    // Prioritize City, Town, Village, then County/State
+                    const city = data.address.city || data.address.town || data.address.village || data.address.county;
+                    const country = data.address.country;
+                    setName(city ? `${city}, ${country}` : data.display_name.split(',').slice(0, 2).join(','));
                 } else {
                     setName(`${parseFloat(lat).toFixed(4)}, ${parseFloat(long).toFixed(4)}`);
                 }
             } catch (e) {
-                console.warn("Reverse geocode failed:", e);
                 setName(`${parseFloat(lat).toFixed(4)}, ${parseFloat(long).toFixed(4)}`);
             }
         };

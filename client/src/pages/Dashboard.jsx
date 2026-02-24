@@ -1,7 +1,7 @@
-import { motion } from 'framer-motion';
+import React, { useState, useContext, useEffect } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
-import { useContext, useEffect, useState } from 'react';
 import { BlockchainContext } from '../context/BlockchainContext';
+import { motion } from 'framer-motion';
 
 const Dashboard = () => {
     const { contract, currentAccount, currentUser, getLocation } = useContext(BlockchainContext);
@@ -43,7 +43,7 @@ const Dashboard = () => {
         'Retailer': 'End User'
     };
 
-    // Pre-defined addresses for the demo (End User is NOT fixed - any wallet can be an End User)
+    // Pre-defined addresses for the demo
     const roleWallets = {
         'Raw Material Supplier': '0xcd3b766cCdD6Ae721141F452C550Ca635964ce71',
         'Manufacturer': '0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266',
@@ -52,38 +52,23 @@ const Dashboard = () => {
         'Retailer': '0x90f79bf6eb2c4f870365e785982e1f101e93b906'
     };
 
-    // For End User: use whatever wallet is currently connected (dynamic).
-    // For all other roles: use their fixed designated wallet.
-    const expectedWallet = currentUser?.role === 'End User'
-        ? currentAccount
-        : (currentUser ? roleWallets[currentUser.role] : null);
-
-    // Only show mismatch warning for roles with a fixed wallet (not End User)
     const isWalletMismatch = currentUser && currentAccount &&
-        currentUser.role !== 'End User' &&
-        expectedWallet &&
-        currentAccount.toLowerCase() !== expectedWallet.toLowerCase();
+        roleWallets[currentUser.role] &&
+        currentAccount.toLowerCase() !== roleWallets[currentUser.role].toLowerCase();
 
     const statusMap = ["Created", "In Transit", "In Warehouse", "Delivered"];
     const formatId = (id) => String(id).padStart(4, '0');
 
     // --- Fetch Inventory ---
     const fetchInventory = async () => {
-        if (!contract || !currentUser) return;
-
-        // ALWAYS fetch inventory for the role's designated wallet address,
-        // NOT the currently connected MetaMask account. This prevents one role
-        // from seeing another's products when the wrong MetaMask account is active.
-        const walletToQuery = expectedWallet;
-        if (!walletToQuery) return; // Safety: unknown role
-
+        if (!contract || !currentAccount) return;
         setIsInventoryLoading(true);
         try {
             const count = await contract.productCount();
             const items = [];
             for (let i = Number(count); i >= 1; i--) {
                 const p = await contract.getProduct(i);
-                if (p.currentOwner.toLowerCase() === walletToQuery.toLowerCase()) {
+                if (p.currentOwner.toLowerCase() === currentAccount.toLowerCase()) {
                     items.push({
                         id: p.id.toString(),
                         name: p.name,
@@ -105,14 +90,10 @@ const Dashboard = () => {
     const fetchStock = async () => {
         if (!contract || !currentAccount || currentUser.role !== 'Manufacturer') return;
         try {
-            console.log("Fetching stock for account:", currentAccount);
             const rmCount = await contract.rawMaterialCount();
-            console.log("Total RM Count on blockchain:", rmCount.toString());
-
             const stock = [];
             for (let i = 1; i <= Number(rmCount); i++) {
                 const balance = await contract.getCheckStock(currentAccount, i);
-                console.log(`Checking Material ID ${i}, Balance:`, balance.toString());
                 if (Number(balance) > 0) {
                     const material = await contract.getRawMaterial(i);
                     stock.push({
@@ -122,7 +103,6 @@ const Dashboard = () => {
                     });
                 }
             }
-            console.log("Final Manufacturer Stock:", stock);
             setManufacturerStock(stock);
         } catch (error) {
             console.error("Error fetching stock:", error);
@@ -260,7 +240,7 @@ const Dashboard = () => {
         try {
             setLoading(true);
 
-            // Get Location (will explicitly ask for permission locally before sending transaction)
+            // Get Location
             const location = await getLocation();
 
             const { productId } = transferData;
@@ -437,10 +417,7 @@ const Dashboard = () => {
                         <form onSubmit={handleCreateProduct} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                             {/* Material Selection */}
                             <div style={{ marginBottom: '1rem', background: 'rgba(255,255,255,0.05)', padding: '1rem', borderRadius: '8px' }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                                    <h4 style={{ margin: 0 }}>Select Raw Materials ({manufacturerStock.length} available)</h4>
-                                    <button onClick={(e) => { e.preventDefault(); fetchStock(); }} className="btn-modern" style={{ padding: '0.25rem 0.75rem', fontSize: '0.75rem' }}>🔄 Refresh Stock</button>
-                                </div>
+                                <h4 style={{ margin: '0 0 1rem 0' }}>Select Raw Materials ({manufacturerStock.length} available)</h4>
                                 {manufacturerStock.length === 0 ? (
                                     <p style={{ color: '#94a3b8' }}>No raw materials in stock. You can still create products, but raw material tracking will be empty.</p>
                                 ) : (
@@ -558,9 +535,6 @@ const Dashboard = () => {
                     {currentUser.role !== 'End User' && (
                         <motion.div id="transfer-section" className="modern-card" style={{ padding: '2rem', maxWidth: '600px', margin: '0 auto' }}>
                             <h3>Transfer Product</h3>
-                            <div style={{ marginBottom: '1.5rem', padding: '1rem', background: 'rgba(59, 130, 246, 0.1)', border: '1px solid rgba(59, 130, 246, 0.4)', borderRadius: '8px', fontSize: '0.9rem' }}>
-                                📍 <strong>Location Tracking is Mandatory:</strong> You must grant browser location permissions to transfer this product.
-                            </div>
                             <form onSubmit={handleTransferProduct} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                                 <label>Product ID</label>
                                 <input type="number" name="productId" value={transferData.productId} onChange={handleTransferChange} className="modern-input" required />
@@ -574,7 +548,7 @@ const Dashboard = () => {
                                 )}
 
                                 <button type="submit" disabled={loading} className="btn-modern">
-                                    {loading ? 'Authenticating Location...' : 'Grant Location & Transfer'}
+                                    {loading ? 'Processing (with Location)...' : 'Transfer'}
                                 </button>
                             </form>
                         </motion.div>

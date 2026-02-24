@@ -1,13 +1,12 @@
-import { useContext } from 'react';
-import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
-import BackgroundMotion from './components/BackgroundMotion';
+import React, { useContext } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
-import { BlockchainContext } from './context/BlockchainContext';
-import Admin from './pages/Admin';
 import Dashboard from './pages/Dashboard';
-import Landing from './pages/Landing';
-import Login from './pages/Login';
 import TrackProduct from './pages/TrackProduct';
+import Login from './pages/Login';
+import Landing from './pages/Landing';
+import Admin from './pages/Admin';
+import { BlockchainContext } from './context/BlockchainContext';
 
 const ProtectedRoute = ({ children }) => {
   const { currentUser } = useContext(BlockchainContext);
@@ -21,7 +20,6 @@ function App() {
   return (
     <Router>
       <div className="App">
-        <BackgroundMotion />
         <Navbar />
         <Routes>
           <Route path="/" element={<Landing />} />

@@ -1,5 +1,5 @@
+import React, { createContext, useEffect, useState } from 'react';
 import { ethers } from 'ethers';
-import { createContext, useEffect, useState } from 'react';
 import { contractABI, contractAddress } from '../utils/constants';
 
 export const BlockchainContext = createContext();
@@ -94,21 +94,10 @@ const BlockchainProvider = ({ children }) => {
     };
 
     const getLocation = async () => {
-        return new Promise(async (resolve, reject) => {
+        return new Promise((resolve, reject) => {
             if (!navigator.geolocation) {
-                return reject(new Error("Geolocation is not supported by your browser. Location tracking is mandatory for this action."));
-            }
-
-            try {
-                // In modern Chrome/Edge, sometimes asking for permissions explicitly first helps trigger the popup if it's stuck.
-                if (navigator.permissions && navigator.permissions.query) {
-                    const result = await navigator.permissions.query({ name: 'geolocation' });
-                    if (result.state === 'denied') {
-                        return reject(new Error("Location permission is currently denied! Please click the lock icon next to your URL bar, allow Location access, and refresh the page."));
-                    }
-                }
-
-                // Actually request the position which triggers the prompt if state is 'prompt'
+                reject(new Error("Geolocation is not supported by your browser"));
+            } else {
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
                         resolve({
@@ -117,24 +106,10 @@ const BlockchainProvider = ({ children }) => {
                         });
                     },
                     (error) => {
-                        console.error("Geolocation Error detailed:", error);
-                        let errorMessage = "Unknown location error.";
-                        if (error.code === error.PERMISSION_DENIED) {
-                            errorMessage = "You denied the request for Geolocation. Please click the lock icon in your URL bar, change Location to 'Allow', and try again. Location is mandatory.";
-                        } else if (error.code === error.POSITION_UNAVAILABLE) {
-                            errorMessage = "Location information is unavailable. (Check if Windows Location Services is ON in your PC Settings). Location is mandatory.";
-                        } else if (error.code === error.TIMEOUT) {
-                            errorMessage = "The request to get your location timed out. Please try again.";
-                        }
-
-                        reject(new Error(errorMessage));
-                    },
-                    { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+                        console.error("Error getting location:", error);
+                        resolve({ lat: "0", long: "0" }); // Default to 0,0 on error to allow flow to continue
+                    }
                 );
-
-            } catch (err) {
-                console.error("Unexpected error in getLocation block:", err);
-                reject(new Error("Failed to get location."));
             }
         });
     };
