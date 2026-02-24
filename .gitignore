@@ -1,0 +1,25 @@
+# General
+node_modules/
+.DS_Store
+*.log
+.env
+coverage/
+
+# Smart Contracts (Hardhat)
+smart-contracts/artifacts/
+smart-contracts/cache/
+smart-contracts/typechain/
+smart-contracts/typechain-types/
+
+# Server
+server/uploads/*
+!server/uploads/.gitkeep
+
+# Client (Vite/React)
+client/dist/
+client/dist-ssr/
+*.local
+
+# IDEs
+.vscode/
+.idea/

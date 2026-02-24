@@ -1,0 +1,47 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "username": "manufacturer",
+      "password": "pass",
+      "role": "Manufacturer",
+      "walletAddress": "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266"
+    },
+    {
+      "id": 2,
+      "username": "warehouse",
+      "password": "pass",
+      "role": "Warehouse",
+      "walletAddress": "0x70997970c51812dc3a010c7d01b50e0d17dc79c8"
+    },
+    {
+      "id": 3,
+      "username": "supplier",
+      "password": "pass",
+      "role": "Supplier",
+      "walletAddress": "0x3c44cdddb6a900fa2b585dd299e03d12fa4293bc"
+    },
+    {
+      "id": 4,
+      "username": "retailer",
+      "password": "pass",
+      "role": "Retailer",
+      "walletAddress": "0x90f79bf6eb2c4f870365e785982e1f101e93b906"
+    },
+    {
+      "id": 5,
+      "username": "enduser",
+      "password": "pass",
+      "role": "End User",
+      "walletAddress": "0x8626f6940e2eb28930efb4cef49b2d1f2c9c1199"
+    },
+    {
+      "id": 6,
+      "username": "provider",
+      "password": "pass",
+      "role": "Raw Material Supplier",
+      "walletAddress": "0xcd3b766cCdD6Ae721141F452C550Ca635964ce71"
+    }
+  ],
+  "products": []
+}
